@@ -1,0 +1,28 @@
+Notes on Breezy Day, by Malaclypse the Younger (mal2fnord@gmail.com)
+https://mal-2.bandcamp.com/album/bjam-demos
+
+This is a rompler made from two wind chimes that normally hang in my back yard. The bars are clearly not fine tuned in their natural state, and even in "Tuned Mode" they'll still be a bit rough. All samples are at 48kHz. 
+
+The "Sweep Up" and "Sweep Down" samples have three speeds, all at the same pitches (only the time is stretched). The one in the center of the three is the original, while the outer ones are at a 5:6 and 6:5 ratio to it.
+
+When playing a tuned chime, or an untuned small chime, velocities 0-80 use a soft or mellow sample, 120-127 use a hard or bright sample, and in between the two samples get mixed proportionally. There is no such mixing for the sweeps or the untuned big chimes.
+
+===== LEGAL BULLSHIT =====
+•	All rights wronged, all wrongs reversed.
+•	The sounds you create are entirely your own. Whether I approve or disapprove or even know about your project is completely irrelevant.
+•	I'm not particularly worried about the pictures included with this package. Do what you need to.
+•	You may share this VST instrument if you wish, but leave this notice intact. I would prefer that people go to the source to assure the most recent version, but I know this is not always possible.
+•	The MIT license applies only to distribution of the Software itself, and individual components that comprise it. There is ABSOLUTELY NO REQUIREMENT to provide credit when merely using the instrument to make sound. You are only required to provide the boilerplate license if distributing the instrument itself or pieces of.
+
+----------------------------Begin boilerplate license---------------------------
+MIT License 
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions: 
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. Additionally, all alterations which are distributed are to be attributed to the person or organization making them.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+-----------------------------End boilerplate license----------------------------
+
+Versioning:
+1.20.10: first release, October 2020
+2.21.08: first SFZ port. Adds functions inherited from Party Pipes because why not. Maize Sampler files (from previous version) also included.

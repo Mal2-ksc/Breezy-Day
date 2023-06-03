@@ -1,0 +1,191 @@
+// Breezy Day 2.0 by Malaclypse the Younger, mal2fnord@gmail.com
+// This is an enhanced SFZ port of the Maize Sampler version. The velocity layer transitions are smoother and the overlap region larger, but the samples and their assignments are pretty much the same.
+// The modulation and filter options have simply been inherited from another of my instruments, and they seem like a fun or at least harmless extension so I am leaving them in. The Maize Sampler version doesn't have any of them.
+// Key names use the "key 60 = C3" convention. While I have been convinced to use 60 = C4 in the future, I'm not rewriting everything I've already done over it.
+// 
+// ===== LEGAL BULLSHIT =====
+// • All rights wronged, all wrongs reversed.
+// • The sounds you create are entirely your own. Whether I approve or disapprove or even know about your project is completely irrelevant.
+// • I'm not particularly worried about the pictures included with this package. Do what you need to.
+// • You may share this package if you wish, but leave this notice intact. I would prefer that people go to the source to assure the most recent version, but I know this is not always possible.
+// • The MIT license applies only to distribution of the Software itself, and individual components that comprise it. There is ABSOLUTELY NO REQUIREMENT to provide credit when merely using the instrument to make sound. You are only required to provide the boilerplate license if distributing the instrument itself or pieces of.
+//
+// --------------------------Begin boilerplate license--------------------------
+// MIT License 
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy 
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions: 
+// 
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software. Additionally, all 
+// alterations which are distributed are to be attributed to the person or
+// organization making them.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+// ---------------------------End boilerplate license---------------------------
+
+// Curve 0 is linear, from 0 to 1. v000=0 v127=1
+// Curve 1 is bipolar, from -1 to 1.  v000=-1 v127=1
+// Curve 2 is inverted linear, from 1 to 0. v000=1 v127=0
+// Curve 3 bipolar inverted, from 1 to -1. v000=1 v127=-1
+// Curve 4 concave (square the Curve 0 value).
+// Curve 5 is Xfin power curve (square root of Curve 0 value).
+// Curve 6 is Xfout power curve (square root of Curve 2 value).
+
+<curve> curve_index=8 // 100 to 0 and stay at 0 (low velocity group)
+v0=1 v48=1 v127=0
+
+<curve> curve_index=9 // 0 to 0 to 100 (high velocity group)
+v0=0 v48=0 v127=1
+
+<control>
+#define $MODDEPTH 200 // How wide (in cents) is maximum modulation?
+#define $STARTVOL 80 // Default value for CC7 (Volume).
+#define $PB_RANGE 200 // How wide (in cents) is pitch bending? Swings both ways.
+#define $SHAKETIME 10 // Mod fade-in, seconds after note-on (to full width)
+
+set_cc1=0 label_cc1=∿1:Mod Wheel ₀  // ❶Two Mod controls, this one on the expected CC1.
+set_cc3=63 label_cc3=∿3:Mod Rate ₅₀ // ❶Modulation rate. 0 = 3 Hz, 127 = 8 Hz. (see below in "global")
+set_cc4=38 label_cc4=4:Mod Fade ₃₀ // ❶Length of time for modulation to fade in
+set_cc5=0 label_cc5=5:Attack Time ₀ // ❶Max roll-in of notes based on cc5.
+set_cc6=127 label_cc6=6:LPF ¬ Frq ₁₀₀ // ❶Default to Nyquist freq. (effectively disabled)
+set_cc7=$STARTVOL label_cc7=⇌7:Master Vol. ₆₃  // ❶
+// CC8 = Balance.
+set_cc10=63 label_cc10=⇌10:Pan ₅₀  // ❶
+// CC11 = Expression. CC12 and 13 are usually for automation.
+
+<global>
+xf_keycurve=power ampeg_release_shape=1 ampeg_release=0.04
+lfo01_pitch_curvecc1=7 // "Sensitive" curve, so the extreme can be wild.
+lfo01_freq_curvecc3=4 lfo01_freq=0.01 lfo01_freq_oncc3=21.99 // Modulation rate. 0 = 0.01 Hz, 127 = 21.99 Hz, 50% = 5.5 Hz because of sqrt(x) curve 4
+lfo01_pitch_oncc1=$MODDEPTH lfo01_pitch_oncc21=$MODDEPTH // Modulation depth. Range set by #define above.
+lfo01_fade_oncc4=$SHAKETIME
+fil_type=lpf_1p cutoff=20 cutoff_cc6=22030 cutoff_curvecc6=4 // Hi-Cut
+amplitude_oncc7=100 amplitude_curvecc7=4 // default for CC7, specifying avoids glitchiness.
+// pan_oncc10=0 // No pressing need to recycle CC10.
+pitch_curvecc10=1 // Pick pitch starts centered, goes both ways.
+ampeg_attackcc5=1 // Max roll-in of notes based on cc5 (time in seconds).
+// Bend range for primary Pitch Bend, both directions.
+bend_up=$PB_RANGE bend_down=-$PB_RANGE
+volume=0 volume_curvecc131=1 volume_cc131=0
+sostenuto_sw=on
+
+// Breezy Day normal sample handler. Keyboard optimized.
+// Untuned big chimes
+  <group> lokey=36 hikey=41
+    <region> key=36 sample=samples/bigchime1.wav
+    <region> key=37 sample=samples/bigchime2.wav
+    <region> key=38 sample=samples/bigchime3.wav
+    <region> key=39 sample=samples/bigchime4.wav
+    <region> key=40 sample=samples/bigchime5.wav
+// Tuned big chimes
+  <group> lokey=41 hikey=62
+    <region> pitch_keycenter=33 tune=-49 amplitude_cc131=100 amplitude_curvecc131=8 sample=samples/bigchime1.wav
+    <region> pitch_keycenter=48 tune=35 amplitude_cc131=100 amplitude_curvecc131=9 sample=samples/bigchime5.wav
+// Tuned small chimes
+  <group> lokey=63 hikey=64 pitch_keycenter=64 tune=41 
+    <region> amplitude_cc131=100 amplitude_curvecc131=8 sample=samples/chime 01s.wav
+    <region> amplitude_cc131=100 amplitude_curvecc131=9 sample=samples/chime 01h.wav
+  <group> lokey=65 hikey=66 pitch_keycenter=66 tune=0
+    <region> amplitude_cc131=100 amplitude_curvecc131=8 sample=samples/chime 03s.wav
+    <region> amplitude_cc131=100 amplitude_curvecc131=9 sample=samples/chime 03h.wav
+  <group> lokey=67 hikey=68 pitch_keycenter=67 tune=-3
+    <region> amplitude_cc131=100 amplitude_curvecc131=8 sample=samples/chime 04s.wav
+    <region> amplitude_cc131=100 amplitude_curvecc131=9 sample=samples/chime 04h.wav
+  <group> lokey=69 hikey=70 pitch_keycenter=68 tune=0
+    <region> amplitude_cc131=100 amplitude_curvecc131=8 sample=samples/chime 05s.wav
+    <region> amplitude_cc131=100 amplitude_curvecc131=9 sample=samples/chime 05h.wav
+  <group> lokey=71 hikey=72 pitch_keycenter=69 tune=-30
+    <region> amplitude_cc131=100 amplitude_curvecc131=8 sample=samples/chime 06s.wav
+    <region> amplitude_cc131=100 amplitude_curvecc131=9 sample=samples/chime 06h.wav
+  <group> lokey=73 hikey=74 pitch_keycenter=72 tune=-6
+    <region> amplitude_cc131=100 amplitude_curvecc131=8 sample=samples/chime 08s.wav
+    <region> amplitude_cc131=100 amplitude_curvecc131=9 sample=samples/chime 08h.wav
+  <group> lokey=75 hikey=76 // not using 09 soft, subbing 08 soft
+    <region> pitch_keycenter=72 tune=-6 amplitude_cc131=100 amplitude_curvecc131=8 sample=samples/chime 08s.wav
+    <region> pitch_keycenter=74 tune=32 amplitude_cc131=100 amplitude_curvecc131=9 sample=samples/chime 09h.wav
+  <group> lokey=77 hikey=78 pitch_keycenter=77 tune=0
+    <region> amplitude_cc131=100 amplitude_curvecc131=8 sample=samples/chime 11s.wav
+    <region> amplitude_cc131=100 amplitude_curvecc131=9 sample=samples/chime 11h.wav
+  <group> lokey=79 hikey=80 pitch_keycenter=78 tune=37
+    <region> amplitude_cc131=100 amplitude_curvecc131=8 sample=samples/chime 12s.wav
+    <region> amplitude_cc131=100 amplitude_curvecc131=9 sample=samples/chime 12h.wav
+  <group> lokey=81 hikey=82 pitch_keycenter=81 tune=23
+    <region> amplitude_cc131=100 amplitude_curvecc131=8 sample=samples/chime 14s.wav
+    <region> amplitude_cc131=100 amplitude_curvecc131=9 sample=samples/chime 14h.wav
+  <group> lokey=83 hikey=84 pitch_keycenter=83 tune=0
+    <region> amplitude_cc131=100 amplitude_curvecc131=8 sample=samples/chime 15s.wav
+    <region> amplitude_cc131=100 amplitude_curvecc131=9 sample=samples/chime 15h.wav
+// Sweep section
+  <group> lokey=85 hikey=90
+    <region> key=85 sample=samples/wind chime ascending slow.wav
+    <region> key=86 sample=samples/wind chime ascending normal.wav
+    <region> key=87 sample=samples/wind chime ascending fast.wav
+    <region> key=88 sample=samples/wind chime descending slow.wav
+    <region> key=89 sample=samples/wind chime descending normal.wav
+    <region> key=90 sample=samples/wind chime descending fast.wav
+// Untuned small chimes
+  <group> key=91
+    <region> amplitude_cc131=100 amplitude_curvecc131=8 sample=samples/chime 01s.wav
+    <region> amplitude_cc131=100 amplitude_curvecc131=9 sample=samples/chime 01h.wav
+  <group> key=92
+    <region> amplitude_cc131=100 amplitude_curvecc131=8 sample=samples/chime 02s.wav
+    <region> amplitude_cc131=100 amplitude_curvecc131=9 sample=samples/chime 02h.wav
+  <group> key=93
+    <region> amplitude_cc131=100 amplitude_curvecc131=8 sample=samples/chime 03s.wav
+    <region> amplitude_cc131=100 amplitude_curvecc131=9 sample=samples/chime 03h.wav
+  <group> key=94
+    <region> amplitude_cc131=100 amplitude_curvecc131=8 sample=samples/chime 04s.wav
+    <region> amplitude_cc131=100 amplitude_curvecc131=9 sample=samples/chime 04h.wav
+  <group> key=95
+    <region> amplitude_cc131=100 amplitude_curvecc131=8 sample=samples/chime 05s.wav
+    <region> amplitude_cc131=100 amplitude_curvecc131=9 sample=samples/chime 05h.wav
+  <group> key=96
+    <region> amplitude_cc131=100 amplitude_curvecc131=8 sample=samples/chime 06s.wav
+    <region> amplitude_cc131=100 amplitude_curvecc131=9 sample=samples/chime 06h.wav
+  <group> key=97
+    <region> amplitude_cc131=100 amplitude_curvecc131=8 sample=samples/chime 07s.wav
+    <region> amplitude_cc131=100 amplitude_curvecc131=9 sample=samples/chime 07h.wav
+  <group> key=98
+    <region> amplitude_cc131=100 amplitude_curvecc131=8 sample=samples/chime 08s.wav
+    <region> amplitude_cc131=100 amplitude_curvecc131=9 sample=samples/chime 08h.wav
+  <group> key=99
+    <region> amplitude_cc131=100 amplitude_curvecc131=8 sample=samples/chime 09s.wav
+    <region> amplitude_cc131=100 amplitude_curvecc131=9 sample=samples/chime 09h.wav
+  <group> key=100
+    <region> amplitude_cc131=100 amplitude_curvecc131=8 sample=samples/chime 10s.wav
+    <region> amplitude_cc131=100 amplitude_curvecc131=9 sample=samples/chime 10h.wav
+  <group> key=101
+    <region> amplitude_cc131=100 amplitude_curvecc131=8 sample=samples/chime 11s.wav
+    <region> amplitude_cc131=100 amplitude_curvecc131=9 sample=samples/chime 11h.wav
+  <group> key=102
+    <region> amplitude_cc131=100 amplitude_curvecc131=8 sample=samples/chime 12s.wav
+    <region> amplitude_cc131=100 amplitude_curvecc131=9 sample=samples/chime 12h.wav
+  <group> key=103
+    <region> amplitude_cc131=100 amplitude_curvecc131=8 sample=samples/chime 13s.wav
+    <region> amplitude_cc131=100 amplitude_curvecc131=9 sample=samples/chime 13h.wav
+  <group> key=104
+    <region> amplitude_cc131=100 amplitude_curvecc131=8 sample=samples/chime 14s.wav
+    <region> amplitude_cc131=100 amplitude_curvecc131=9 sample=samples/chime 14h.wav
+  <group> key=105
+    <region> amplitude_cc131=100 amplitude_curvecc131=8 sample=samples/chime 15s.wav
+    <region> amplitude_cc131=100 amplitude_curvecc131=9 sample=samples/chime 15h.wav
+  <group> key=106
+    <region> amplitude_cc131=100 amplitude_curvecc131=8 sample=samples/chime 16s.wav
+    <region> amplitude_cc131=100 amplitude_curvecc131=9 sample=samples/chime 16h.wav
+  <group> key=107
+    <region> amplitude_cc131=100 amplitude_curvecc131=8 sample=samples/chime 17s.wav
+    <region> amplitude_cc131=100 amplitude_curvecc131=9 sample=samples/chime 17h.wav
+  <group> key=108
+    <region> amplitude_cc131=100 amplitude_curvecc131=8 sample=samples/chime 18s.wav
+    <region> amplitude_cc131=100 amplitude_curvecc131=9 sample=samples/chime 18h.wav
